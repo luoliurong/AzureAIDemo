@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2005
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrameCollector", "FrameCollector\FrameCollector.csproj", "{0C973C6A-9AF1-47D7-A0BE-31804F5CF1CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoCapturer", "VideoCapturer\VideoCapturer.csproj", "{C532BA3F-1696-4BE5-A2C0-F7921E483A54}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CF485A2C-49D4-4E46-8116-B7D18F3CE422}"
+	ProjectSection(SolutionItems) = preProject
+		Solution.cs = Solution.cs
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FaceGroupTrainer", "FaceGroupTrainer\FaceGroupTrainer.csproj", "{31F222CE-F46F-4296-A23C-E2D7AF9E83CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0C973C6A-9AF1-47D7-A0BE-31804F5CF1CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C973C6A-9AF1-47D7-A0BE-31804F5CF1CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C973C6A-9AF1-47D7-A0BE-31804F5CF1CF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0C973C6A-9AF1-47D7-A0BE-31804F5CF1CF}.Debug|x86.Build.0 = Debug|Any CPU
+		{0C973C6A-9AF1-47D7-A0BE-31804F5CF1CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C973C6A-9AF1-47D7-A0BE-31804F5CF1CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C973C6A-9AF1-47D7-A0BE-31804F5CF1CF}.Release|x86.ActiveCfg = Release|Any CPU
+		{0C973C6A-9AF1-47D7-A0BE-31804F5CF1CF}.Release|x86.Build.0 = Release|Any CPU
+		{C532BA3F-1696-4BE5-A2C0-F7921E483A54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C532BA3F-1696-4BE5-A2C0-F7921E483A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C532BA3F-1696-4BE5-A2C0-F7921E483A54}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C532BA3F-1696-4BE5-A2C0-F7921E483A54}.Debug|x86.Build.0 = Debug|Any CPU
+		{C532BA3F-1696-4BE5-A2C0-F7921E483A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C532BA3F-1696-4BE5-A2C0-F7921E483A54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C532BA3F-1696-4BE5-A2C0-F7921E483A54}.Release|x86.ActiveCfg = Release|Any CPU
+		{C532BA3F-1696-4BE5-A2C0-F7921E483A54}.Release|x86.Build.0 = Release|Any CPU
+		{31F222CE-F46F-4296-A23C-E2D7AF9E83CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31F222CE-F46F-4296-A23C-E2D7AF9E83CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31F222CE-F46F-4296-A23C-E2D7AF9E83CC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{31F222CE-F46F-4296-A23C-E2D7AF9E83CC}.Debug|x86.Build.0 = Debug|Any CPU
+		{31F222CE-F46F-4296-A23C-E2D7AF9E83CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31F222CE-F46F-4296-A23C-E2D7AF9E83CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31F222CE-F46F-4296-A23C-E2D7AF9E83CC}.Release|x86.ActiveCfg = Release|Any CPU
+		{31F222CE-F46F-4296-A23C-E2D7AF9E83CC}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {770742F9-9AA2-4F5A-9FDD-E9374EE3A556}
+	EndGlobalSection
+EndGlobal
