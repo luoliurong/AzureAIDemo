@@ -58,7 +58,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConcurrentLogger.cs" />
     <Compile Include="FrameGrabber.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VideoFrame.cs" />

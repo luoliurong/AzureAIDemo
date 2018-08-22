@@ -13,4 +13,16 @@ namespace VideoCapturer
 		public string[] CelebrityNames { get; set; } = null;
 		public Microsoft.ProjectOxford.Vision.Contract.Tag[] Tags { get; set; } = null;
 	}
+
+	public class LiveAnalyzeResult
+	{
+		//for text detection result
+		public Microsoft.ProjectOxford.Vision.Contract.Region[] Regions { get; set; } = null;
+
+		//for face identification result
+		public string[] FaceIdentifyResult { get; set; } = null;
+
+		//for emotion detection result
+		public Microsoft.ProjectOxford.Face.Contract.Face[] EmotionFaces { get; set; } = null;
+	}
 }

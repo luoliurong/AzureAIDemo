@@ -70,7 +70,7 @@ namespace FrameCollector
 				Frame = frame;
 			}
 			public VideoFrame Frame { get; }
-			public AnalysisResultType Analysis { get; set; } = default(AnalysisResultType);
+			public AnalysisResultType AnalysisResult { get; set; } = default(AnalysisResultType);
 			public bool TimedOut { get; set; } = false;
 			public Exception Exception { get; set; } = null;
 		}
@@ -296,13 +296,11 @@ namespace FrameCollector
 				var frameCount = 0;
 				while (!_stopping)
 				{
-					ConcurrentLogger.WriteToFile($"Producer: waiting for timer to trigger frame grab.");
 					_frameGrabTimer.WaitOne();
 					var startTime = DateTime.Now;
 					var timestamp = timestampFn();
 					Mat image = new Mat();
 					bool success = _reader.Read(image);
-					ConcurrentLogger.WriteToFile($"Producer: grame-grab took {(DateTime.Now - startTime).Milliseconds}ms");
 					if (!success)
 					{
 						if (_reader.CaptureType == CaptureType.File)
@@ -321,7 +319,6 @@ namespace FrameCollector
 					meta.Index = frameCount;
 					meta.Timestamp = timestamp;
 					VideoFrame vFrame = new VideoFrame(image, meta);
-					ConcurrentLogger.WriteToFile($"Producer: new frame provided, frame num: {meta.Index}");
 					OnNewFrameProvided(vFrame);
 
 					if (_analysisPredicate(vFrame))
@@ -364,7 +361,6 @@ namespace FrameCollector
 					if (nextTask != null)
 					{
 						var result = await nextTask;
-						ConcurrentLogger.WriteToFile($"Consumer: got result for frame {result.Frame.Metadata.Index}. {_analysisTaskQueue.Count} tasks in queue.");
 						OnNewResultAvailable(result);
 					}
 				}
@@ -376,11 +372,6 @@ namespace FrameCollector
 				{
 					bool missed = _frameGrabTimer.WaitOne(0);
 					_frameGrabTimer.Set();
-					if (missed)
-					{
-						ConcurrentLogger.WriteToFile($"Timer: Frame missed grab {timeIterations-1}");
-					}
-					ConcurrentLogger.WriteToFile($"Timer: grabed frame {timeIterations}");
 					++timeIterations;
 				}
 				finally
@@ -446,7 +437,7 @@ namespace FrameCollector
 				{
 					if (task == await Task.WhenAny(task, Task.Delay(AnalysisTimeout, source.Token)))
 					{
-						output.Analysis = await task;
+						output.AnalysisResult = await task;
 						source.Cancel();
 					}
 					else
