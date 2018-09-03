@@ -147,7 +147,6 @@
     <Compile Include="..\Solution.cs">
       <Link>Solution.cs</Link>
     </Compile>
-    <Compile Include="Visualization.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
