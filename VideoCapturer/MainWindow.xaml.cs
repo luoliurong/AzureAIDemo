@@ -57,22 +57,22 @@ namespace VideoCapturer
 
 		public MainWindow()
 		{
+			_grabber = new FrameGrabber<LiveAnalyzeResult>();
 			InitializeComponent();
+			InitializeClientAPIs();
+		}
 
+		private void InitializeClientAPIs()
+		{
 			// Create API clients. 
 			_faceClient = new FaceAPI.FaceServiceClient(FACE_API_KEY, FACE_API_ROOT);
 			_visionClient = new VisionAPI.VisionServiceClient(VISION_API_KEY, VISION_API_ROOT);
 
-			_grabber = new FrameGrabber<LiveAnalyzeResult>();
-
-			// Set up a listener for when the client receives a new frame.
 			_grabber.NewFrameProvided += (s, e) =>
 			{
-				// The callback may occur on a different thread, so we must use the
-				// MainWindow.Dispatcher when manipulating the UI.
 				this.Dispatcher.BeginInvoke((Action)(() =>
 				{
-					// Display the image in the left pane.
+					// Display the image in the left pane captured from camera.
 					LeftImage.Source = e.Frame.Image.ToBitmapSource();
 				}));
 
@@ -178,7 +178,90 @@ namespace VideoCapturer
 			_localFaceDetector.Load("Data/haarcascade_frontalface_alt2.xml");
 		}
 
-		#region private methods
+		#region 1-prepare person group for identification, including (create person group, add persons into the group, upload images and then train the group)
+
+		private async void BtnCreate_Click(object sender, RoutedEventArgs e)
+		{
+			var progress = new Progress<string>(msg => {
+				this.Dispatcher.Invoke(() =>
+				{
+					this.ResultList.Items.Add(msg);
+				});
+			});
+
+			await DoBackgroudWork(progress);
+
+			this.ResultList.Items.Add("Preparation work tasks completed!");
+		}
+
+		private async Task DoBackgroudWork(IProgress<string> progress)
+		{
+			//step1: to create a person group
+			progress.Report("Executing task to create person group...");
+			await _faceClient.CreatePersonGroupAsync(personGroupId, "My Friends");
+
+			//step2: to add persons into person group
+			progress.Report("Executing task to add 'Ara' into person group...");
+			var result = await _faceClient.CreatePersonAsync(personGroupId, "Ara");
+			PersonIdDic.TryAdd("Ara", result.PersonId);
+
+			progress.Report("Executing task to add 'Ron' into person group...");
+			result = await _faceClient.CreatePersonAsync(personGroupId, "Ron");
+			PersonIdDic.TryAdd("Ron", result.PersonId);
+
+			//step3: to upload images for persons in group:
+			progress.Report("Executing task to upload pictures of 'Ara'...");
+			await UploadImagesForPerson(ArasPath, "Ara");
+
+			progress.Report("Executing task to upload pictures of 'Ron'...");
+			await UploadImagesForPerson(RonsPath, "Ron");
+
+			//step4: to train the person group
+			progress.Report(string.Format("Executing task to train the person group {0}...", personGroupId));
+			await TrainPersonGroupTask();
+		}
+
+		private async Task UploadImagesForPerson(string dirPath, string personName)
+		{
+			Guid personId = Guid.Empty;
+			PersonIdDic.TryGetValue(personName, out personId);
+			foreach (string imagePath in Directory.GetFiles(dirPath, "*.jpg"))
+			{
+				try
+				{
+					using (Stream s = File.OpenRead(imagePath))
+					{
+						//#3. upload face images of a specific person.
+						await _faceClient.AddPersonFaceAsync(personGroupId, personId, s);
+					}
+				}
+				catch
+				{
+					continue;
+				}
+			}
+		}
+
+		private async Task TrainPersonGroupTask()
+		{
+			//#4. API to train the person groups
+			await _faceClient.TrainPersonGroupAsync(personGroupId);
+
+			FaceAPI.Contract.TrainingStatus trainingStatus = null;
+			while (true)
+			{
+				trainingStatus = await _faceClient.GetPersonGroupTrainingStatusAsync(personGroupId);
+
+				if (trainingStatus.Status != FaceAPI.Contract.Status.Running)
+				{
+					break;
+				}
+
+				await Task.Delay(1000);
+			}
+		}
+
+		#endregion
 
 		private async void StartButton_Click(object sender, RoutedEventArgs e)
 		{
@@ -286,12 +369,9 @@ namespace VideoCapturer
 
 		private async Task<LiveAnalyzeResult> EmotionAnalysisFunction(VideoFrame frame)
 		{
-			// Encode image. 
 			var jpg = frame.Image.ToMemoryStream(".jpg", s_jpegParams);
-			// Submit image to API. 
 			FaceAPI.Contract.Face[] faces = null;
 
-			// See if we have local face detections for this image.
 			var localFaces = (OpenCvSharp.Rect[])frame.UserData;
 			if (localFaces == null || localFaces.Count() > 0)
 			{
@@ -306,7 +386,6 @@ namespace VideoCapturer
 			}
 			else
 			{
-				// Local face detection found no faces; don't call Cognitive Services.
 				faces = new FaceAPI.Contract.Face[0];
 			}
 
@@ -348,92 +427,5 @@ namespace VideoCapturer
 				}
 			};
 		}
-
-		#region 1-prepare person group for identification, including (create person group, add persons into the group, upload images and then train the group)
-
-		private async void BtnCreate_Click(object sender, RoutedEventArgs e)
-		{
-			var progress = new Progress<string>(msg => {
-				this.Dispatcher.Invoke(() =>
-				{
-					this.ResultList.Items.Add(msg);
-				});
-			});
-
-			await DoBackgroudWork(progress);
-
-			this.ResultList.Items.Add("Preparation work tasks completed!");
-		}
-
-		private async Task DoBackgroudWork(IProgress<string> progress)
-		{
-			//step1: to create a person group
-			progress.Report("Executing task to create person group...");
-			await _faceClient.CreatePersonGroupAsync(personGroupId, "My Friends");
-
-			//step2: to add persons into person group
-			progress.Report("Executing task to add 'Ara' into person group...");
-			var result = await _faceClient.CreatePersonAsync(personGroupId, "Ara");
-			PersonIdDic.TryAdd("Ara", result.PersonId);
-
-			progress.Report("Executing task to add 'Ron' into person group...");
-			result = await _faceClient.CreatePersonAsync(personGroupId, "Ron");
-			PersonIdDic.TryAdd("Ron", result.PersonId);
-
-			//step3: to upload images for persons in group:
-			progress.Report("Executing task to upload pictures of 'Ara'...");
-			await UploadImagesForPerson(ArasPath, "Ara");
-
-			progress.Report("Executing task to upload pictures of 'Ron'...");
-			await UploadImagesForPerson(RonsPath, "Ron");
-
-			//step4: to train the person group
-			progress.Report(string.Format("Executing task to train the person group {0}...", personGroupId));
-			await TrainPersonGroupTask();
-		}
-
-		private async Task UploadImagesForPerson(string dirPath, string personName)
-		{
-			Guid personId = Guid.Empty;
-			PersonIdDic.TryGetValue(personName, out personId);
-			foreach (string imagePath in Directory.GetFiles(dirPath, "*.jpg"))
-			{
-				try
-				{
-					using (Stream s = File.OpenRead(imagePath))
-					{
-						//#3. upload face images of a specific person.
-						await _faceClient.AddPersonFaceAsync(personGroupId, personId, s);
-					}
-				}
-				catch
-				{
-					continue;
-				}
-			}
-		}
-
-		private async Task TrainPersonGroupTask()
-		{
-			//#4. API to train the person groups
-			await _faceClient.TrainPersonGroupAsync(personGroupId);
-
-			FaceAPI.Contract.TrainingStatus trainingStatus = null;
-			while (true)
-			{
-				trainingStatus = await _faceClient.GetPersonGroupTrainingStatusAsync(personGroupId);
-
-				if (trainingStatus.Status != FaceAPI.Contract.Status.Running)
-				{
-					break;
-				}
-
-				await Task.Delay(1000);
-			}
-		}
-
-		#endregion
-
-		#endregion
 	}
 }

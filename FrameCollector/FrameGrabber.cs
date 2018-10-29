@@ -321,7 +321,7 @@ namespace FrameCollector
 					VideoFrame vFrame = new VideoFrame(image, meta);
 					OnNewFrameProvided(vFrame);
 
-					if (_analysisPredicate(vFrame))
+					if (_analysisPredicate != null && _analysisPredicate(vFrame))
 					{
 						var analysisTask = DoAnalyzeFrame(vFrame);
 						_analysisTaskQueue.Add(analysisTask);
